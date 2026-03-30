@@ -7,6 +7,7 @@ import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.core import callback
 
 from .const import (
     CONF_API_KEY,
@@ -71,7 +72,7 @@ class CorreiosTrackerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     @staticmethod
-    @config_entries.core.callback
+    @callback
     def async_get_options_flow(entry: config_entries.ConfigEntry) -> config_entries.OptionsFlow:
         return CorreiosTrackerOptionsFlow(entry)
 
