@@ -3,7 +3,10 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/nemiro-TECH/correios_tracker_ha)](https://github.com/nemiro-TECH/correios_tracker_ha/releases)
 
-Uma integração personalizada (Custom Component) robusta e assíncrona para rastrear encomendas dos Correios diretamente no Home Assistant, utilizando a API do [Rastreio](https://www.siterastreio.com.br/).
+<<<<<<< HEAD
+Uma integração personalizada (Custom Component) robusta e assíncrona para rastrear encomendas dos Correios diretamente no Home Assistant, utilizando a API do [SiteRastreio](https://www.siterastreio.com.br/).
+=======
+
 
 > 🎨 **Interface Gráfica:** Para a melhor experiência visual no seu painel (dashboard), utilize o nosso cartão Lovelace oficial: [Correios Tracker Card](https://github.com/nemiro-TECH/correios_tracker_card).
 
@@ -23,7 +26,7 @@ Uma integração personalizada (Custom Component) robusta e assíncrona para ras
 ## 🔑 Pré-requisitos
 
 Esta integração consome a API RESTful do SeuRastreio para garantir estabilidade e evitar bloqueios de IP (captchas) comuns no site dos Correios.
-1. Aceda a [seurastreio.com.br](https://seurastreio.com.br/) e crie uma conta gratuita.
+1. Aceda a [seurastreio.com.br](https://siterastreio.com.br/) e crie uma conta gratuita.
 2. Vá ao Dashboard > **Chaves de API**.
 3. Gere uma nova chave. Vai precisar dela durante a instalação no Home Assistant.
 
