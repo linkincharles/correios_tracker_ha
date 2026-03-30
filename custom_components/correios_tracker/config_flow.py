@@ -9,6 +9,7 @@ from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import (
+    TRACKER_API_URL,
     CONF_API_KEY,
     CONF_DESCRIPTION,
     CONF_PACKAGES,
@@ -16,29 +17,50 @@ from .const import (
     CONF_TRACKING_CODE,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
-    SEURASTREIO_API_URL,
+    #SEURASTREIO_API_URL,
+    TRACKER_API_URL,
 )
 
 TRACKING_REGEX = re.compile(r"^[A-Z]{2}\d{9}[A-Z]{2}$")
 
 
+# async def _test_api_key(api_key: str) -> str | None:
+#     """Testa a chave de API. Retorna None se válida, ou string de erro."""
+#     # Usa um código de teste fictício — se retornar 401 a chave é inválida
+#     url = SEURASTREIO_API_URL.format(codigo="AA000000000BR")
+#     headers = {"Authorization": f"Bearer {api_key}", "Accept": "application/json"}
+#     try:
+#         async with aiohttp.ClientSession() as session:
+#             async with session.get(
+#                 url, headers=headers, timeout=aiohttp.ClientTimeout(total=10)
+#             ) as resp:
+#                 if resp.status == 401:
+#                     return "invalid_api_key"
+#                 # 200, 404, 422 etc → chave aceita pelo servidor
+#                 return None
+#     except (aiohttp.ClientError, asyncio.TimeoutError):
+#         return "cannot_connect"
+
 async def _test_api_key(api_key: str) -> str | None:
-    """Testa a chave de API. Retorna None se válida, ou string de erro."""
-    # Usa um código de teste fictício — se retornar 401 a chave é inválida
-    url = SEURASTREIO_API_URL.format(codigo="AA000000000BR")
-    headers = {"Authorization": f"Bearer {api_key}", "Accept": "application/json"}
+    """Testa a chave no formato 'user|token'."""
+    if "|" not in api_key:
+        # Se usarem a conta de teste, passamos a validação automaticamente
+        if api_key.lower() == "teste":
+            return None
+        return "invalid_api_key"
+
+    user, token = api_key.split("|", 1)
+    url = TRACKER_API_URL.format(user=user, token=token, codigo="LX000000000BR")
+    
     try:
+        import asyncio
         async with aiohttp.ClientSession() as session:
-            async with session.get(
-                url, headers=headers, timeout=aiohttp.ClientTimeout(total=10)
-            ) as resp:
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
                 if resp.status == 401:
                     return "invalid_api_key"
-                # 200, 404, 422 etc → chave aceita pelo servidor
                 return None
     except (aiohttp.ClientError, asyncio.TimeoutError):
         return "cannot_connect"
-
 
 def _valid_code(code: str) -> str:
     code = code.upper().strip()

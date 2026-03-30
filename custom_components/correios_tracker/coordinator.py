@@ -10,7 +10,7 @@ import aiohttp
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import DEFAULT_UPDATE_INTERVAL, DELIVERED_STATUSES, DOMAIN, SEURASTREIO_API_URL
+from .const import DEFAULT_UPDATE_INTERVAL, DELIVERED_STATUSES, DOMAIN, TRACKER_API_URL #SEURASTREIO_API_URL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -78,28 +78,54 @@ class CorreiosDataCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=scan_interval),
         )
 
-    async def _async_update_data(self) -> dict[str, Any]:
-        url = SEURASTREIO_API_URL.format(codigo=self.tracking_code)
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Accept": "application/json",
-        }
+    #Substituido _update_data para o padão do Link&Track
+    async def _update_data(self) -> dict:
+        # Permite usar uma conta própria ou o fallback público de testes
+        if "|" in self.api_key:
+            user, token = self.api_key.split("|", 1)
+        else:
+            # Usuário de teste público (pode sofrer limite de tráfego em horas de ponta)
+            user = "teste"
+            token = "1abcd00b2731640e886fb41a8a9671ad1434c599dbaa0a0de9a5aa619f29a83f"
+
+        url = TRACKER_API_URL.format(user=user, token=token, codigo=self.tracking_code)
+
         try:
+            import asyncio
             async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    url, headers=headers, timeout=aiohttp.ClientTimeout(total=30)
-                ) as resp:
-                    if resp.status == 401:
-                        raise UpdateFailed("Chave de API inválida")
-                    if resp.status == 404:
-                        return self._empty("Objeto não encontrado")
-                    if resp.status != 200:
-                        raise UpdateFailed(f"Erro HTTP {resp.status}")
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                    if resp.status == 429:
+                        _LOGGER.warning("Rate limit atingido na API Link&Track.")
+                        return self.data or self._empty("Rate limit atingido")
+                        
+                    resp.raise_for_status()
                     data = await resp.json()
-                    _LOGGER.debug("Resposta API [%s]: %s", self.tracking_code, data)
                     return self._parse(data)
         except (aiohttp.ClientError, asyncio.TimeoutError) as err:
-            raise UpdateFailed(f"Erro de conexão ou tempo esgotado com SeuRastreio: {err}") from err
+            raise UpdateFailed(f"Erro de conexão com Link&Track: {err}")
+            
+    # async def _async_update_data(self) -> dict[str, Any]:
+    #     url = SEURASTREIO_API_URL.format(codigo=self.tracking_code)
+    #     headers = {
+    #         "Authorization": f"Bearer {self.api_key}",
+    #         "Accept": "application/json",
+    #     }
+    #     try:
+    #         async with aiohttp.ClientSession() as session:
+    #             async with session.get(
+    #                 url, headers=headers, timeout=aiohttp.ClientTimeout(total=30)
+    #             ) as resp:
+    #                 if resp.status == 401:
+    #                     raise UpdateFailed("Chave de API inválida")
+    #                 if resp.status == 404:
+    #                     return self._empty("Objeto não encontrado")
+    #                 if resp.status != 200:
+    #                     raise UpdateFailed(f"Erro HTTP {resp.status}")
+    #                 data = await resp.json()
+    #                 _LOGGER.debug("Resposta API [%s]: %s", self.tracking_code, data)
+    #                 return self._parse(data)
+    #     except (aiohttp.ClientError, asyncio.TimeoutError) as err:
+    #         raise UpdateFailed(f"Erro de conexão ou tempo esgotado com SeuRastreio: {err}") from err
 
     def _empty(self, status: str) -> dict:
         return {
@@ -113,33 +139,64 @@ class CorreiosDataCoordinator(DataUpdateCoordinator):
             "events": [],
         }
 
+    #Substituido _parse para o padão do Link&Track
+
+    # def _parse(self, data: dict) -> dict[str, Any]:
+    #     result = self._empty("Sem informações")
+
+    #     if not data.get("success"):
+    #         result["status"] = data.get("message", "Sem informações")
+    #         return result
+
+    #     evento = data.get("eventoMaisRecente", {}) or {}
+    #     if evento:
+    #         result["status"] = evento.get("descricao") or "Sem informações"
+    #         result["last_update"] = evento.get("data")
+
+    #         loc_text, loc_raw = _parse_location(evento.get("local"))
+    #         result["location"] = loc_text
+    #         result["location_raw"] = loc_raw
+
+    #         desc_lower = (evento.get("descricao") or "").lower()
+    #         result["is_delivered"] = any(s in desc_lower for s in DELIVERED_STATUSES)
+
+    #     parsed_events = []
+    #     for e in (data.get("eventos") or []):
+    #         loc_text, _ = _parse_location(e.get("local"))
+    #         parsed_events.append({
+    #             "data": e.get("data", ""),
+    #             "status": e.get("descricao", ""),
+    #             "local": loc_text or "",
+    #         })
+    #     result["events"] = parsed_events
+
+    #     return result
     def _parse(self, data: dict) -> dict[str, Any]:
         result = self._empty("Sem informações")
 
-        if not data.get("success"):
-            result["status"] = data.get("message", "Sem informações")
+        eventos = data.get("eventos", [])
+        if not eventos:
+            result["status"] = "Aguardando postagem ou não encontrado"
             return result
 
-        evento = data.get("eventoMaisRecente", {}) or {}
-        if evento:
-            result["status"] = evento.get("descricao") or "Sem informações"
-            result["last_update"] = evento.get("data")
-
-            loc_text, loc_raw = _parse_location(evento.get("local"))
-            result["location"] = loc_text
-            result["location_raw"] = loc_raw
-
-            desc_lower = (evento.get("descricao") or "").lower()
-            result["is_delivered"] = any(s in desc_lower for s in DELIVERED_STATUSES)
+        # O primeiro evento da lista é sempre o mais recente
+        evento_recente = eventos[0]
+        
+        result["status"] = evento_recente.get("status", "Sem informações")
+        result["last_update"] = f"{evento_recente.get('data', '')} às {evento_recente.get('hora', '')}"
+        result["location"] = evento_recente.get("local")
+        result["location_raw"] = None
+        
+        desc_lower = result["status"].lower()
+        result["is_delivered"] = any(s in desc_lower for s in DELIVERED_STATUSES)
 
         parsed_events = []
-        for e in (data.get("eventos") or []):
-            loc_text, _ = _parse_location(e.get("local"))
+        for e in eventos:
             parsed_events.append({
-                "data": e.get("data", ""),
-                "status": e.get("descricao", ""),
-                "local": loc_text or "",
+                "data": f"{e.get('data', '')} às {e.get('hora', '')}",
+                "status": e.get("status", ""),
+                "local": e.get("local", ""),
             })
+            
         result["events"] = parsed_events
-
         return result
