@@ -70,7 +70,7 @@ class CorreiosDataCoordinator(DataUpdateCoordinator[dict]):
         self.description = description
         self.api_key = api_key
 
-    async def _update_data(self) -> dict:
+    async def _async_update_data(self) -> dict:
         # Permite usar uma conta própria ou o fallback público de testes
         if "|" in self.api_key:
             user, token = self.api_key.split("|", 1)
