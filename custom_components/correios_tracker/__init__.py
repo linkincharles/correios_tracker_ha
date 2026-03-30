@@ -101,18 +101,22 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             return
 
         code = call.data[CONF_TRACKING_CODE].upper().strip()
-        packages: list[dict] = list(entry.options.get(CONF_PACKAGES, []))
-        packages = [p for p in packages if p[CONF_TRACKING_CODE] != code]
-        hass.config_entries.async_update_entry(entry, options={CONF_PACKAGES: packages})
 
-        if entry.entry_id in hass.data.get(DOMAIN, {}):
-            hass.data[DOMAIN][entry.entry_id]["coordinators"].pop(code, None)
-
+        # 1. Remove entidades do registry PRIMEIRO — antes do reload disparado pelo update_entry
         registry = er.async_get(hass)
-        for entity_entry in er.async_entries_for_config_entry(registry, entry.entry_id):
+        for entity_entry in list(er.async_entries_for_config_entry(registry, entry.entry_id)):
             if f"correios_{code.lower()}" in entity_entry.unique_id:
                 registry.async_remove(entity_entry.entity_id)
                 _LOGGER.debug("Entidade %s removida", entity_entry.entity_id)
+
+        # 2. Remove coordinator da memória
+        if entry.entry_id in hass.data.get(DOMAIN, {}):
+            hass.data[DOMAIN][entry.entry_id]["coordinators"].pop(code, None)
+
+        # 3. Atualiza options (dispara reload — package já não está na lista)
+        packages: list[dict] = list(entry.options.get(CONF_PACKAGES, []))
+        packages = [p for p in packages if p[CONF_TRACKING_CODE] != code]
+        hass.config_entries.async_update_entry(entry, options={CONF_PACKAGES: packages})
 
         _LOGGER.info("Pacote %s removido", code)
 
