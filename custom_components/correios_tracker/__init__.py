@@ -27,7 +27,8 @@ PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
 TRACKING_REGEX = re.compile(r"^[A-Z]{2}\d{9}[A-Z]{2}$")
 
 #Config por UI. Sistema não deve procurar configurações em texto.
-CONFIG_SCHEMA = cv.config_entry_only_config_schema
+#v.0.1.0 faltou o DOMAIN. Corrigido na v.0.1.0
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN) 
 
 ADD_PACKAGE_SCHEMA = vol.Schema({
     vol.Required(CONF_TRACKING_CODE): cv.string,

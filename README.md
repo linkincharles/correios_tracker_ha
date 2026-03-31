@@ -2,8 +2,14 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/nemiro-TECH/correios_tracker_ha)](https://github.com/nemiro-TECH/correios_tracker_ha/releases)
+[![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://www.buymeacoffee.com/nemiro)
 
-Uma integração personalizada (Custom Component) robusta e assíncrona para rastrear encomendas dos Correios diretamente no Home Assistant, utilizando a API do [SeuRastreio](https://seurastreio.com.br/).
+
+## Intro
+
+**Uma integração personalizada (Custom Component) robusta e assíncrona para rastrear encomendas dos Correios diretamente no Home Assistant, utilizando a API do [SiteRastreio](https://www.siterastreio.com.br/).**
+
+---
 
 > 🎨 **Interface Gráfica:** Para a melhor experiência visual no seu painel (dashboard), utilize o nosso cartão Lovelace oficial: [Correios Tracker Card](https://github.com/nemiro-TECH/correios_tracker_card).
 
@@ -23,7 +29,7 @@ Uma integração personalizada (Custom Component) robusta e assíncrona para ras
 ## 🔑 Pré-requisitos
 
 Esta integração consome a API RESTful do SeuRastreio para garantir estabilidade e evitar bloqueios de IP (captchas) comuns no site dos Correios.
-1. Aceda a [seurastreio.com.br](https://seurastreio.com.br/) e crie uma conta gratuita.
+1. Aceda a [seurastreio.com.br](https://siterastreio.com.br/) e crie uma conta gratuita.
 2. Vá ao Dashboard > **Chaves de API**.
 3. Gere uma nova chave. Vai precisar dela durante a instalação no Home Assistant.
 
@@ -69,6 +75,7 @@ Para adicionar ou remover pacotes posteriormente, basta clicar em **Configurar**
 Como cada pacote cria um sensor com o histórico de movimentações, é muito fácil criar automações para ser notificado quando o estado de entrega muda.
 
 **Notificação quando a encomenda "Saiu para entrega":**
+
 ```yaml
 alias: "Notificação: Encomenda Saiu para Entrega"
 description: "Avisa no telemóvel quando os Correios saem para entregar um pacote"
