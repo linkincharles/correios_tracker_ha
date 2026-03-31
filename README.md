@@ -5,11 +5,7 @@
 [![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://www.buymeacoffee.com/nemiro)
 
 
-## Intro
-
-**Uma integração personalizada (Custom Component) robusta e assíncrona para rastrear encomendas dos Correios diretamente no Home Assistant, utilizando a API do [SiteRastreio](https://www.siterastreio.com.br/).**
-
----
+Uma integração personalizada (Custom Component) robusta e assíncrona para rastrear encomendas dos Correios diretamente no Home Assistant, utilizando a API do [SeuRastreio](https://seurastreio.com.br/).
 
 > 🎨 **Interface Gráfica:** Para a melhor experiência visual no seu painel (dashboard), utilize o nosso cartão Lovelace oficial: [Correios Tracker Card](https://github.com/nemiro-TECH/correios_tracker_card).
 
