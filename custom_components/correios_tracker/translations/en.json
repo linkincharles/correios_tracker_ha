@@ -1,0 +1,53 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Link&Track",
+        "description": "Enter your Link&Track API **User** and **Token**.\n\n> **Test Mode:** If you do not have an account, leave both fields completely blank and click SUBMIT to use the free test version.",
+        "data": {
+          "api_user": "User",
+          "api_key": "API Key (Token)"
+        }
+      }
+    },
+    "error": {
+      "invalid_api_key": "Invalid credentials. Please check your User and Token.",
+      "cannot_connect": "Failed to connect to the Link&Track API."
+    },
+    "abort": {
+      "already_configured": "The Correios Tracker integration is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Manage Packages",
+        "description": "{summary}\nWhat would you like to do?",
+        "data": {
+          "action": "Action"
+        }
+      },
+      "add": {
+        "title": "Add Package",
+        "data": {
+          "tracking_code": "Tracking Code",
+          "description": "Alias (e.g., Mary's Gift)",
+          "scan_interval": "Update interval (minutes)"
+        }
+      },
+      "remove": {
+        "title": "Remove Package",
+        "data": {
+          "remove_code": "Select the package to remove"
+        }
+      }
+    },
+    "error": {
+      "invalid_format": "Invalid code. It must follow the format (e.g., AA123456789BR).",
+      "already_exists": "This code is already being tracked."
+    },
+    "abort": {
+      "no_packages": "There are no packages to remove."
+    }
+  }
+}
