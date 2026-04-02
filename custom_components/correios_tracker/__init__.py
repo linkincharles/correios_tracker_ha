@@ -26,6 +26,8 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
 TRACKING_REGEX = re.compile(r"^[A-Z]{2}\d{9}[A-Z]{2}$")
 
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
 ADD_PACKAGE_SCHEMA = vol.Schema({
     vol.Required(CONF_TRACKING_CODE): cv.string,
     vol.Optional(CONF_DESCRIPTION, default=""): cv.string,
