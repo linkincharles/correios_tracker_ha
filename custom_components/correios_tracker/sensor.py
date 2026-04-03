@@ -37,11 +37,11 @@ class CorreiosSensor(CoordinatorEntity, SensorEntity):
             name=f"{self.coordinator.description} ({self.coordinator.tracking_code})",
             manufacturer="Correios / Total Express",
             model="Pacote Rastreado",
-            sw_version="2.1.0"
+            sw_version="0.1.2"
         )
         
     @property
-    def state(self):
+    def native_value(self):
         """Devolve o status (estado) mais recente."""
         if self.coordinator.data:
             return self.coordinator.data.get("status", "Desconhecido")

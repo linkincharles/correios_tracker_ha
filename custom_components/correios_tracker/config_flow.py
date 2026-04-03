@@ -21,7 +21,7 @@ async def _test_api_key(api_key: str) -> str | None:
     headers = {"Authorization": f"Bearer {api_key}", "Accept": "application/json"}
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, timeout=10) as resp:
+            async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=10)) as resp:
                 if resp.status == 401:
                     return "invalid_api_key"
                 return None
@@ -43,7 +43,7 @@ class CorreiosTrackerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if error:
                 errors["base"] = error
             else:
-                return self.async_create_entry(title="Correios Tracker", data={CONF_API_KEY: api_key, CONF_PACKAGES: []})
+                return self.async_create_entry(title="Correios Tracker", data={CONF_API_KEY: api_key}, options={CONF_PACKAGES: []})
         return self.async_show_form(step_id="user", data_schema=vol.Schema({vol.Required(CONF_API_KEY): str}), errors=errors)
 
     @staticmethod

@@ -40,7 +40,7 @@ class CorreiosDeliveredSensor(CoordinatorEntity, BinarySensorEntity):
             name=f"{self.coordinator.description} ({self.coordinator.tracking_code})",
             manufacturer="Correios / Total Express",
             model="Pacote Rastreado",
-            sw_version="2.1.0",
+            sw_version="0.1.2",
         )
 
     @property
