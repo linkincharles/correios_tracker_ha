@@ -7,6 +7,8 @@
 
 Uma integração personalizada (Custom Component) robusta e assíncrona para rastrear encomendas dos Correios diretamente no Home Assistant, utilizando a API do [SeuRastreio](https://seurastreio.com.br/).
 
+UPDATE 27-Abril-2026: Não irei mais manter este código. O API do "SeuRastreio" permite apenas 50 chamados por mês. A API dos Correios Brasil precisa de cadastro de empresa com contrato. Não irei desenvolver pois não é viável cada usuario fazer um contrato com os Correios. Caso tenham alguma sugestão podem abrir um Issue que irei avaliar.
+
 > 🎨 **Interface Gráfica:** Para a melhor experiência visual no seu painel (dashboard), utilize o nosso cartão Lovelace oficial: [Correios Tracker Card](https://github.com/nemiro-TECH/correios_tracker_card).
 
 ---
